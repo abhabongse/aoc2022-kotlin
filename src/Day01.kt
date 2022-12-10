@@ -1,17 +1,32 @@
+/* Solution to Day 1: Calorie Counting
+ * https://adventofcode.com/2022/day/1
+ */
+import utils.splitAt
+import java.io.File
+
+
+/**
+ * An elf represents a list of items [calories] that it carries around
+ */
+data class Elf(val calories: List<Int>)
+
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
-    }
+    val fileName =
+//        "day01_sample.txt"
+        "day01_input.txt"
+    val elves = readInput(fileName)
 
-    fun part2(input: List<String>): Int {
-        return input.size
-    }
+    // Part 1: find the most calories carried by an elf
+    val p1Calories = elves.maxOfOrNull { elf -> elf.calories.sum() }
+    println("Part 1: $p1Calories")
 
-    // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
+    // Part 2: find the sum of calories carried by top-3 elves
+}
 
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+/**
+ * Reads and parses input data according to the problem statement.
+ */
+fun readInput(fileName: String): List<Elf> {
+    return File("inputs", fileName).readLines().splitAt { line -> line.trim().isEmpty() }
+        .map { caloriesGroup -> Elf(caloriesGroup.map(String::toInt)) }.toList()
 }
