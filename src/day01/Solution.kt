@@ -1,10 +1,11 @@
 /* Solution to Day 1: Calorie Counting
  * https://adventofcode.com/2022/day/1
  */
+package day01
+
 import utils.largest
 import utils.splitAt
 import java.io.File
-
 
 fun main() {
     val fileName =
@@ -29,8 +30,12 @@ fun main() {
  * Reads and parses input data according to the problem statement.
  */
 fun readInput(fileName: String): List<Elf> {
-    return File("inputs", fileName).readLines().asSequence().splitAt { line -> line.trim().isEmpty() }
-        .map { caloriesGroup -> Elf(caloriesGroup.map(String::toInt)) }.toList()
+    return File("inputs", fileName)
+        .readLines()
+        .asSequence()
+        .splitAt { line -> line.trim().isEmpty() }
+        .map { caloriesGroup -> Elf(caloriesGroup.map(String::toInt)) }
+        .toList()
 }
 
 /**
