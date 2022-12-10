@@ -10,7 +10,6 @@ fun main() {
 //        "day02_sample.txt"
         "day02_input.txt"
     val roundStrategies = readInput(fileName)
-    println(roundStrategies)
 
     // Part 1: interpret the second column as the response to the opponent's action
     val p1Scores = roundStrategies.sumOf { computeRoundScore(it.opponentAction, it.p1ResponseAction) }
@@ -34,39 +33,39 @@ fun readInput(fileName: String): List<RoundStrategy> {
         .toList()
 }
 
-data class RoundStrategy(val fst: Char, val snd: Char) {
+data class RoundStrategy(val first: Char, val second: Char) {
     companion object {
         private val pattern = """([ABC])\s+([XYZ])""".toRegex()
         infix fun fromString(string: String): RoundStrategy {
-            val (fst, snd) = pattern.matchEntire(string.trim())
+            val (first, second) = pattern.matchEntire(string.trim())
                 ?.destructured
                 ?: throw IllegalArgumentException("invalid input line: $string")
-            return RoundStrategy(fst.single(), snd.single())
+            return RoundStrategy(first.single(), second.single())
         }
     }
 
     val opponentAction: Action
-        get() = when (this.fst) {
+        get() = when (this.first) {
             'A' -> Action.ROCK
             'B' -> Action.PAPER
             'C' -> Action.SCISSORS
-            else -> throw IllegalArgumentException("invalid first char: ${this.fst}")
+            else -> throw IllegalArgumentException("invalid first char: ${this.first}")
         }
 
     val p1ResponseAction: Action
-        get() = when (this.snd) {
+        get() = when (this.second) {
             'X' -> Action.ROCK
             'Y' -> Action.PAPER
             'Z' -> Action.SCISSORS
-            else -> throw IllegalArgumentException("invalid second char: ${this.snd}")
+            else -> throw IllegalArgumentException("invalid second char: ${this.second}")
         }
 
     val p2DesiredOutcome: Outcome
-        get() = when (this.snd) {
+        get() = when (this.second) {
             'X' -> Outcome.LOSE
             'Y' -> Outcome.DRAW
             'Z' -> Outcome.WIN
-            else -> throw IllegalArgumentException("invalid second char: ${this.snd}")
+            else -> throw IllegalArgumentException("invalid second char: ${this.second}")
         }
 }
 
