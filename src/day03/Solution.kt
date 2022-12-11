@@ -1,5 +1,5 @@
-/* Solution to Day 2: Rock Paper Scissors
- * https://adventofcode.com/2022/day/2
+/* Solution to Day 3: Rucksack Reorganization
+ * https://adventofcode.com/2022/day/3
  */
 package day03
 
@@ -43,13 +43,11 @@ fun readInput(fileName: String): List<RoundStrategy> {
 }
 
 data class RoundStrategy(val content: String) {
-
     val firstCompartment: String
         get() {
             val length = this.content.length
             return this.content.slice(0 until length / 2)
         }
-
     val secondCompartment: String
         get() {
             val length = this.content.length
