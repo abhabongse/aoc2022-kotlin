@@ -5,6 +5,8 @@ package day07
 
 import day07.Command.ChangeDirectory
 import day07.Command.ListDirectoryContent
+import day07.ListDirectoryResult.FileResult
+import day07.ListDirectoryResult.SubDirectory
 import utils.splitBefore
 import java.io.File
 
@@ -15,7 +17,6 @@ fun main() {
     val histories = readInput(fileName)
     val fileSizes = listFileSizes(histories)
     val dirSizes = computeDirSizes(fileSizes)
-    println(dirSizes)
 
     // Part 1: directories with total size at most 100_000
     val p1SumTotalSize = dirSizes
@@ -26,7 +27,7 @@ fun main() {
 
     // Part 2: find directory just large enough to remove so that
     // there is enough available space to system upgrade
-    val currentUsage = dirSizes.find { (path, _) -> path.isEmpty() }!!.second
+    val currentUsage = dirSizes[listOf()]!!
     val spaceToRemove = currentUsage - 40_000_000
     val p2MatchedSize = dirSizes
         .map { (_, size) -> size }
@@ -44,27 +45,34 @@ fun readInput(fileName: String): List<History> {
         .asSequence()
         .map { it.trim() }
         .splitBefore { it.startsWith("$ ") }
-        .map { lines -> History(command = lines[0].removePrefix("$ "), results = lines.drop(1)) }
-        .toList()
+        .map { lines: List<String> ->
+            History(
+                command = lines[0].removePrefix("$ "),
+                results = lines.drop(1)
+            )
+        }.toList()
 }
 
 /**
- * A command history entry consisting of the [command] string and the list of [results].
+ * A single command history entry consisting of the unparsed [command] string
+ * and the list of unparsed [results].
  */
 data class History(val command: String, val results: List<String>)
 
 /**
- * One of two command types: [ListDirectoryContent] (ls) or [ChangeDirectory] (cd).
+ * A command type consisting of two subtypes:
+ * - [ListDirectoryContent] for `ls` command
+ * - [ChangeDirectory] for `cd` command
  */
 sealed class Command {
-    class ListDirectoryContent() : Command()
+    object ListDirectoryContent : Command()
     class ChangeDirectory(val arg: String) : Command()
 
     companion object {
         infix fun fromString(string: String): Command {
             val tokens = string.split("""\s+""".toRegex())
             return if (tokens[0] == "ls" && tokens.size == 1) {
-                ListDirectoryContent()
+                ListDirectoryContent
             } else if (tokens[0] == "cd" && tokens.size == 2) {
                 ChangeDirectory(arg = tokens[1])
             } else {
@@ -74,9 +82,13 @@ sealed class Command {
     }
 }
 
+/**
+ * Each line result for the [Command.ListDirectoryContent] command.
+ * Two possible subtypes: a [SubDirectory] or a [FileResult].
+ */
 sealed class ListDirectoryResult {
     class SubDirectory(val name: String) : ListDirectoryResult()
-    class File(val name: String, val size: Int) : ListDirectoryResult()
+    class FileResult(val name: String, val size: Int) : ListDirectoryResult()
 
     companion object {
         infix fun fromString(string: String): ListDirectoryResult {
@@ -86,7 +98,7 @@ sealed class ListDirectoryResult {
             } else if (tokens[0] == "dir") {
                 SubDirectory(name = tokens[1])
             } else {
-                File(name = tokens[1], size = tokens[0].toInt())
+                FileResult(name = tokens[1], size = tokens[0].toInt())
             }
         }
     }
@@ -100,7 +112,7 @@ typealias Path = List<String>
  */
 fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
     val fileSizes: MutableList<Pair<Path, Int>> = mutableListOf()
-    var workingDir: MutableList<String> = mutableListOf()
+    val workingDir: MutableList<String> = mutableListOf()
     for (history in histories) {
         when (val command = Command fromString history.command) {
             is ChangeDirectory -> {
@@ -114,7 +126,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
             is ListDirectoryContent -> {
                 for (historyResult in history.results) {
                     val result = ListDirectoryResult fromString historyResult
-                    if (result is ListDirectoryResult.File) {
+                    if (result is FileResult) {
                         val path = workingDir.toList() + listOf(result.name)
                         fileSizes.add(Pair(path, result.size))
                     }
@@ -129,7 +141,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
  * Computes the mapping of container directories to their sizes
  * based on the files sizes information returned by [listFileSizes].
  */
-fun computeDirSizes(fileSizes: List<Pair<Path, Int>>): List<Pair<Path, Int>> {
+fun computeDirSizes(fileSizes: List<Pair<Path, Int>>): HashMap<Path, Int> {
     val dirSizes: HashMap<Path, Int> = HashMap()
     for ((path, size) in fileSizes) {
         var path = path.toList()
@@ -138,5 +150,5 @@ fun computeDirSizes(fileSizes: List<Pair<Path, Int>>): List<Pair<Path, Int>> {
             dirSizes[path] = dirSizes.getOrDefault(path, 0) + size
         }
     }
-    return dirSizes.toList()
+    return dirSizes
 }
