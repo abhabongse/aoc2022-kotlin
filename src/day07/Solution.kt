@@ -100,15 +100,14 @@ typealias Path = List<String>
  */
 fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
     val fileSizes: MutableList<Pair<Path, Int>> = mutableListOf()
-    var workingDir: Path = listOf()
+    var workingDir: MutableList<String> = mutableListOf()
     for (history in histories) {
-        val command = Command fromString history.command
-        when (command) {
+        when (val command = Command fromString history.command) {
             is ChangeDirectory -> {
-                workingDir = when (command.arg) {
-                    ".." -> workingDir.dropLast(1)
-                    "/" -> listOf()
-                    else -> workingDir + listOf(command.arg)
+                when (command.arg) {
+                    ".." -> workingDir.removeLast()
+                    "/" -> workingDir.clear()
+                    else -> workingDir.add(command.arg)
                 }
             }
 
