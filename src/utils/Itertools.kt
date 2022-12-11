@@ -63,23 +63,43 @@ private fun <T> Sequence<T>.largestWith(n: Int, comparator: Comparator<T>): List
 }
 
 /**
- * Splits the given iterator into multiple chunks using the given predicate.
+ * Splits the given iterator into multiple chunks
+ * using the given predicate to determine the separator.
  * See also: [more_itertools.split_at](https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.split_at)
- *
- * Implementation Notes:
- * This function is not suitable with
  */
 inline fun <T> Sequence<T>.splitAt(crossinline predicate: (T) -> Boolean): Sequence<List<T>> {
     val iterator = this.iterator()
     return sequence {
         var accmList: ArrayList<T> = arrayListOf()
-        for (line in iterator) {
-            if (predicate(line)) {
+        for (item in iterator) {
+            if (predicate(item)) {
                 this.yield(accmList)
                 accmList = arrayListOf()
             } else {
-                accmList.add(line)
+                accmList.add(item)
             }
+        }
+        if (accmList.isNotEmpty()) {
+            this.yield(accmList)
+        }
+    }
+}
+
+/**
+ * Splits the given iterator into multiple chunks
+ * using the given predicate to determine the start of a new chunk.
+ * See also: [more_itertools.split_before](https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.split_before)
+ */
+inline fun <T> Sequence<T>.splitBefore(crossinline predicate: (T) -> Boolean): Sequence<List<T>> {
+    val iterator = this.iterator()
+    return sequence {
+        var accmList: ArrayList<T> = arrayListOf()
+        for (item in iterator) {
+            if (accmList.isNotEmpty() && predicate(item)) {
+                this.yield(accmList)
+                accmList = arrayListOf()
+            }
+            accmList.add(item)
         }
         if (accmList.isNotEmpty()) {
             this.yield(accmList)
