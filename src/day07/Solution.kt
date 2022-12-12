@@ -27,7 +27,7 @@ fun main() {
 
     // Part 2: find directory just large enough to remove so that
     // there is enough available space to system upgrade
-    val currentUsage = dirSizes[listOf()]!!
+    val currentUsage = dirSizes[Path.root]!!
     val spaceToRemove = currentUsage - 40_000_000
     val p2MatchedSize = dirSizes
         .map { (_, size) -> size }
@@ -105,7 +105,20 @@ sealed class ListDirectoryResult {
     }
 }
 
-typealias Path = List<String>
+/**
+ * Path is represented by an immutable list of path components.
+ */
+@JvmInline
+value class Path(private val data: List<String>) {
+    companion object {
+        val root = Path(emptyList())
+    }
+
+    val parent get() = Path(this.data.dropLast(1))
+    operator fun plus(name: String) = Path(this.data + listOf(name))
+    fun isRoot() = this == root
+    fun isNotRoot() = this != root
+}
 
 /**
  * Obtains the mapping of file paths to their sizes
@@ -113,14 +126,14 @@ typealias Path = List<String>
  */
 fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
     val fileSizes: MutableList<Pair<Path, Int>> = mutableListOf()
-    val workingDir: MutableList<String> = mutableListOf()
+    var workingDir = Path.root
     for (history in histories) {
         when (val command = Command fromString history.command) {
             is ChangeDirectory -> {
-                when (command.arg) {
-                    ".." -> workingDir.removeLast()
-                    "/" -> workingDir.clear()
-                    else -> workingDir.add(command.arg)
+                workingDir = when (command.arg) {
+                    ".." -> workingDir.parent
+                    "/" -> Path.root
+                    else -> workingDir + command.arg
                 }
             }
 
@@ -128,7 +141,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
                 for (historyResult in history.results) {
                     val result = ListDirectoryResult fromString historyResult
                     if (result is FileResult) {
-                        val path = workingDir.toList() + listOf(result.name)
+                        val path = workingDir + result.name
                         fileSizes.add(Pair(path, result.size))
                     }
                 }
@@ -145,11 +158,10 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
 fun computeDirSizes(fileSizes: List<Pair<Path, Int>>): HashMap<Path, Int> {
     val dirSizes: HashMap<Path, Int> = HashMap()
     for ((path, size) in fileSizes) {
-        @Suppress("NAME_SHADOWING")
-        var path = path.toList()
-        while (path.isNotEmpty()) {
-            path = path.dropLast(1)
-            dirSizes[path] = dirSizes.getOrDefault(path, 0) + size
+        var currPath = path
+        while (currPath.isNotRoot()) {
+            currPath = currPath.parent
+            dirSizes[currPath] = dirSizes.getOrDefault(currPath, 0) + size
         }
     }
     return dirSizes
