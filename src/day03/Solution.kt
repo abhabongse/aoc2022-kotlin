@@ -14,6 +14,7 @@ fun main() {
     // Part 1: sum of priorities for item types
     // that appear in both compartments of each rucksack
     val p1SumPriorities = rucksacks
+        .asSequence()
         .map { it.firstCompartment.toSet() intersect it.secondCompartment.toSet() }
         .flatten()
         .map(ItemPriority::lookup)
@@ -38,6 +39,7 @@ fun main() {
 fun readInput(fileName: String): List<RoundStrategy> {
     return File("inputs", fileName)
         .readLines()
+        .asSequence()
         .map { RoundStrategy(it.trim()) }
         .toList()
 }

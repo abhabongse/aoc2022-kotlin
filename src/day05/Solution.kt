@@ -14,6 +14,7 @@ fun main() {
     // Part 1: rearrange crates by CrateMover 9000
     val p1FinalView = simulateCrateMover9000(view, rearrangeOps)
     val p1DesiredCrates = stackLabelOrder
+        .asSequence()
         .map { p1FinalView[it]!!.last() }
         .joinToString(separator = "")
     println("Part 1: $p1DesiredCrates")
@@ -21,6 +22,7 @@ fun main() {
     // Part 2: rearrange crates by CrateMover 9001
     val p2FinalView = simulateCrateMover9001(view, rearrangeOps)
     val p2DesiredCrates = stackLabelOrder
+        .asSequence()
         .map { p2FinalView[it]!!.last() }
         .joinToString(separator = "")
     println("Part 2: $p2DesiredCrates")
@@ -33,19 +35,24 @@ fun readInput(fileName: String): Input {
     val lines = File("inputs", fileName).readLines()
 
     // Prepare crate stacking data
-    val crateStackingLineCount = lines.takeWhile { it.trim().isNotEmpty() }.count()
+    val crateStackingLineCount = lines
+        .asSequence()
+        .takeWhile { it.trim().isNotEmpty() }
+        .count()
     val stackLabelLine = lines[crateStackingLineCount - 1]
     val crateStackingLines = lines.subList(0, crateStackingLineCount - 1).reversed()
 
     // Extract original crate stacking view
     val view: View = hashMapOf()
-    val stackLabelOrder: MutableList<Char> = mutableListOf()
+    val stackLabelOrder: ArrayList<Char> = ArrayList()
     for ((col, stackLabel) in stackLabelLine.withIndex()) {
         if (!stackLabel.isDigit()) {
             continue
         }
-        val stack = crateStackingLines.map { it[col] }.takeWhile { it.isLetter() }.toList()
-        view[stackLabel] = ArrayDeque(stack)
+        view[stackLabel] = crateStackingLines
+            .map { it[col] }
+            .takeWhile { it.isLetter() }
+            .toCollection(ArrayDeque())
         stackLabelOrder.add(stackLabel)
     }
 

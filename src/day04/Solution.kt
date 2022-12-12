@@ -30,6 +30,7 @@ fun main() {
 fun readInput(fileName: String): List<AssignmentPair> {
     return File("inputs", fileName)
         .readLines()
+        .asSequence()
         .map { AssignmentPair fromString it }
         .toList()
 }

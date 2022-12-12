@@ -29,6 +29,7 @@ fun main() {
 fun readInput(fileName: String): List<RoundStrategy> {
     return File("inputs", fileName)
         .readLines()
+        .asSequence()
         .map { RoundStrategy fromString it }
         .toList()
 }

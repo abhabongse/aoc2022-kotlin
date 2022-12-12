@@ -125,7 +125,7 @@ value class Path(private val data: List<String>) {
  * based on the list of command histories.
  */
 fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
-    val fileSizes: MutableList<Pair<Path, Int>> = mutableListOf()
+    val fileSizes: ArrayList<Pair<Path, Int>> = ArrayList()
     var workingDir = Path.root
     for (history in histories) {
         when (val command = Command fromString history.command) {

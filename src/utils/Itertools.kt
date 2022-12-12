@@ -106,3 +106,51 @@ inline fun <T> Sequence<T>.splitBefore(crossinline predicate: (T) -> Boolean): S
         }
     }
 }
+
+/**
+ * Make an iterator that returns accumulated results of binary functions.
+ * See also: [itertools.accumulate](https://docs.python.org/3/library/itertools.html#itertools.accumulate)
+ */
+inline fun <T, R> Sequence<T>.accumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> {
+    var accm = initial
+    val iterator = this.iterator()
+    return sequence {
+        for (item in iterator) {
+            accm = operation(accm, item)
+            this.yield(accm)
+        }
+    }
+}
+
+/**
+ * Make an iterator that returns accumulated results of binary functions.
+ * See also: [itertools.accumulate](https://docs.python.org/3/library/itertools.html#itertools.accumulate)
+ */
+inline fun <T> Sequence<T>.accumulate(crossinline operation: (T, T) -> T): Sequence<T> {
+    var accm: T? = null
+    val iterator = this.iterator()
+    return sequence {
+        for ((index, item) in iterator.withIndex()) {
+            accm = if (index == 0) {
+                item
+            } else {
+                operation(accm!!, item)
+            }
+            this.yield(accm!!)
+        }
+    }
+}
+
+/**
+ * Make an iterator that returns *delayed* accumulated results of binary functions.
+ */
+inline fun <T, R> Sequence<T>.delayedAccumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> {
+    var accm = initial
+    val iterator = this.iterator()
+    return sequence {
+        for (item in iterator) {
+            this.yield(accm)
+            accm = operation(accm, item)
+        }
+    }
+}
