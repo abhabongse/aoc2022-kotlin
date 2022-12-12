@@ -45,19 +45,20 @@ fun readInput(fileName: String): List<History> {
         .asSequence()
         .map { it.trim() }
         .splitBefore { it.startsWith("$ ") }
-        .map { lines: List<String> ->
-            History(
-                command = lines[0].removePrefix("$ "),
-                results = lines.drop(1)
-            )
-        }.toList()
+        .map { lines -> History fromString lines }
+        .toList()
 }
 
 /**
  * A single command history entry consisting of the unparsed [command] string
  * and the list of unparsed [results].
  */
-data class History(val command: String, val results: List<String>)
+data class History(val command: String, val results: List<String>) {
+    companion object {
+        infix fun fromString(lines: List<String>): History =
+            History(command = lines[0].removePrefix("$ "), results = lines.drop(1))
+    }
+}
 
 /**
  * A command type consisting of two subtypes:
@@ -144,6 +145,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
 fun computeDirSizes(fileSizes: List<Pair<Path, Int>>): HashMap<Path, Int> {
     val dirSizes: HashMap<Path, Int> = HashMap()
     for ((path, size) in fileSizes) {
+        @Suppress("NAME_SHADOWING")
         var path = path.toList()
         while (path.isNotEmpty()) {
             path = path.dropLast(1)
