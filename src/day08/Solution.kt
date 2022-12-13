@@ -20,7 +20,7 @@ fun main() {
         .count { (_, _, tree) -> tree.visibleFromOneDirection }
     println("Part 1: $p1VisibleTrees")
 
-    // Part 2:
+    // Part 2: tree with best scenic score
     forest.populateViewingDistance()
     val p2BestScenicScore = forest
         .iteratorRowMajor()
