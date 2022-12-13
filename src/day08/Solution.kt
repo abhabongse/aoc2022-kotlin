@@ -14,31 +14,8 @@ fun main() {
     val forest = readInput(fileName)
 
     // Part 1: visible trees from outside the grid
-    for (i in 0 until forest.numRows) {
-        var accm = -1
-        for (j in 0 until forest.numCols) {
-            forest[i, j].westBlock = accm
-            accm = max(accm, forest[i, j].height)
-        }
-        accm = -1
-        for (j in (0 until forest.numCols).reversed()) {
-            forest[i, j].eastBlock = accm
-            accm = max(accm, forest[i, j].height)
-        }
-    }
-    for (j in 0 until forest.numCols) {
-        var accm = -1
-        for (i in 0 until forest.numRows) {
-            forest[i, j].northBlock = accm
-            accm = max(accm, forest[i, j].height)
-        }
-        accm = -1
-        for (i in (0 until forest.numRows).reversed()) {
-            forest[i, j].southBlock = accm
-            accm = max(accm, forest[i, j].height)
-        }
-    }
-    val p1VisibleTrees = forest.iteratorRowMajor().count { (_, _, tree) -> tree.visible }
+    forest.populateViewingBlockHeight()
+    val p1VisibleTrees = forest.iteratorRowMajor().count { (_, _, tree) -> tree.visibleFromOneDirection }
     println("Part 1: $p1VisibleTrees")
 
     // Part 2:
@@ -57,18 +34,61 @@ fun readInput(fileName: String): Grid<Tree> {
 }
 
 /**
- * Tree information in the forest grid.
+ * Data for each cardinal direction.
  */
-data class Tree(
-    val height: Int,
-    var northBlock: Int = -1,
-    var southBlock: Int = -1,
-    var westBlock: Int = -1,
-    var eastBlock: Int = -1,
-) {
-    val visible
-        get() = this.height > this.northBlock ||
-                this.height > this.southBlock ||
-                this.height > this.westBlock ||
-                this.height > this.eastBlock
+data class FourDirections<T>(var north: T, var south: T, var west: T, var east: T)
+
+/**
+ * Information about the viewing block height and the viewing distance for a tree
+ * toward each of the four cardinal directions.
+ */
+class Tree(internal val height: Int) {
+    internal var blockHeight: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
+    internal var viewingDistance: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
+
+    val visibleFromOneDirection
+        get() = this.height > this.blockHeight.north ||
+                this.height > this.blockHeight.south ||
+                this.height > this.blockHeight.west ||
+                this.height > this.blockHeight.east
+
+    val scenicScore
+        get() = this.viewingDistance.north *
+                this.viewingDistance.south *
+                this.viewingDistance.west *
+                this.viewingDistance.east
+}
+
+/**
+ * Populates the viewing block height data for each tree in all four directions.
+ */
+@OptIn(ExperimentalStdlibApi::class)
+fun Grid<Tree>.populateViewingBlockHeight() {
+    for (i in 0..<this.numRows) {
+        // From the west
+        var accm = -1
+        for (j in 0..<this.numCols) {
+            this[i, j].blockHeight.west = accm
+            accm = max(accm, this[i, j].height)
+        }
+        // From the east
+        accm = -1
+        for (j in (0..<this.numCols).reversed()) {
+            this[i, j].blockHeight.east = accm
+            accm = max(accm, this[i, j].height)
+        }
+    }
+    for (j in 0..<this.numCols) {
+        // From the north
+        var accm = -1
+        for (i in 0..<this.numRows) {
+            this[i, j].blockHeight.north = accm
+            accm = max(accm, this[i, j].height)
+        }
+        accm = -1
+        for (i in (0..<this.numRows).reversed()) {
+            this[i, j].blockHeight.south = accm
+            accm = max(accm, this[i, j].height)
+        }
+    }
 }
