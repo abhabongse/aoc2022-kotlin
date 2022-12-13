@@ -15,16 +15,12 @@ fun main() {
 
     // Part 1: visible trees from outside the grid
     forest.populateViewingBlockHeight()
-    val p1VisibleTrees = forest
-        .iteratorRowMajor()
-        .count { (_, _, tree) -> tree.visibleFromOneDirection }
+    val p1VisibleTrees = forest.iterator().count { tree -> tree.visibleFromOneDirection }
     println("Part 1: $p1VisibleTrees")
 
-    // Part 2: tree with best scenic score
+    // Part 2: tree with the best scenic score
     forest.populateViewingDistance()
-    val p2BestScenicScore = forest
-        .iteratorRowMajor()
-        .maxOf { (_, _, tree) -> tree.scenicScore }
+    val p2BestScenicScore = forest.iterator().maxOf { tree -> tree.scenicScore }
     println("Part 2: $p2BestScenicScore")
 }
 

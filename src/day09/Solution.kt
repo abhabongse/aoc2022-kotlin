@@ -11,7 +11,7 @@ fun main() {
         "day09_sample.txt"
 //        "day09_input.txt"
     val moveInstructions = readInput(fileName)
-//    moveInstructions.forEachIndexed { index, moveInstruction -> println("$index, $moveInstruction") }
+    moveInstructions.forEachIndexed { index, moveInstruction -> println("$index, $moveInstruction") }
 
     // Part 1: number of positions visited by rope tail
     val p1VisitedPositions = 0
