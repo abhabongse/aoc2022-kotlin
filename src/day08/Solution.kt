@@ -15,12 +15,17 @@ fun main() {
 
     // Part 1: visible trees from outside the grid
     forest.populateViewingBlockHeight()
-    val p1VisibleTrees = forest.iteratorRowMajor().count { (_, _, tree) -> tree.visibleFromOneDirection }
+    val p1VisibleTrees = forest
+        .iteratorRowMajor()
+        .count { (_, _, tree) -> tree.visibleFromOneDirection }
     println("Part 1: $p1VisibleTrees")
 
     // Part 2:
-    val p2MatchedSize = 0
-    println("Part 2: $p2MatchedSize")
+    forest.populateViewingDistance()
+    val p2BestScenicScore = forest
+        .iteratorRowMajor()
+        .maxOf { (_, _, tree) -> tree.scenicScore }
+    println("Part 2: $p2BestScenicScore")
 }
 
 /**
@@ -43,14 +48,14 @@ data class FourDirections<T>(var north: T, var south: T, var west: T, var east: 
  * toward each of the four cardinal directions.
  */
 class Tree(internal val height: Int) {
-    internal var blockHeight: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
+    internal var viewingBlockHeight: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
     internal var viewingDistance: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
 
     val visibleFromOneDirection
-        get() = this.height > this.blockHeight.north ||
-                this.height > this.blockHeight.south ||
-                this.height > this.blockHeight.west ||
-                this.height > this.blockHeight.east
+        get() = this.height > this.viewingBlockHeight.north ||
+                this.height > this.viewingBlockHeight.south ||
+                this.height > this.viewingBlockHeight.west ||
+                this.height > this.viewingBlockHeight.east
 
     val scenicScore
         get() = this.viewingDistance.north *
@@ -64,31 +69,75 @@ class Tree(internal val height: Int) {
  */
 @OptIn(ExperimentalStdlibApi::class)
 fun Grid<Tree>.populateViewingBlockHeight() {
-    for (i in 0..<this.numRows) {
-        // From the west
-        var accm = -1
-        for (j in 0..<this.numCols) {
-            this[i, j].blockHeight.west = accm
-            accm = max(accm, this[i, j].height)
+    for (r in 0..<this.numRows) {
+        var maxFromWest = -1  // maintains max height starting from west
+        for (c in 0..<this.numCols) {
+            this[r, c].viewingBlockHeight.west = maxFromWest
+            maxFromWest = max(maxFromWest, this[r, c].height)
         }
-        // From the east
-        accm = -1
-        for (j in (0..<this.numCols).reversed()) {
-            this[i, j].blockHeight.east = accm
-            accm = max(accm, this[i, j].height)
+        var maxFromEast = -1 // maintains max height starting from east
+        for (c in (0..<this.numCols).reversed()) {
+            this[r, c].viewingBlockHeight.east = maxFromEast
+            maxFromEast = max(maxFromEast, this[r, c].height)
         }
     }
-    for (j in 0..<this.numCols) {
-        // From the north
-        var accm = -1
-        for (i in 0..<this.numRows) {
-            this[i, j].blockHeight.north = accm
-            accm = max(accm, this[i, j].height)
+    for (c in 0..<this.numCols) {
+        var maxFromNorth = -1 // maintains max height starting from north
+        for (r in 0..<this.numRows) {
+            this[r, c].viewingBlockHeight.north = maxFromNorth
+            maxFromNorth = max(maxFromNorth, this[r, c].height)
         }
-        accm = -1
-        for (i in (0..<this.numRows).reversed()) {
-            this[i, j].blockHeight.south = accm
-            accm = max(accm, this[i, j].height)
+        var maxFromSouth = -1 // maintains max height starting from south
+        for (r in (0..<this.numRows).reversed()) {
+            this[r, c].viewingBlockHeight.south = maxFromSouth
+            maxFromSouth = max(maxFromSouth, this[r, c].height)
+        }
+    }
+}
+
+/**
+ * Populates the viewing distance data for each tree in all four directions.
+ *
+ * Implementation Details:
+ * e.g. indexForMaxHeight\[h] = the most recent index whose height is at least h
+ *      (initialized to the index indicating the edge of the forest)
+ */
+@OptIn(ExperimentalStdlibApi::class)
+fun Grid<Tree>.populateViewingDistance() {
+    for (r in 0..<this.numRows) {
+        run { // Looking westward
+            val indexForMaxHeight = (0..9).map { 0 }.toCollection(ArrayList())
+            for (c in 0..<this.numCols) {
+                val height = this[r, c].height
+                this[r, c].viewingDistance.west = c - indexForMaxHeight[height]
+                (0..height).forEach { indexForMaxHeight[it] = c }
+            }
+        }
+        run { // Looking eastward
+            val indexForMaxHeight = (0..9).map { this.numCols - 1 }.toCollection(ArrayList())
+            for (c in (0..<this.numCols).reversed()) {
+                val height = this[r, c].height
+                this[r, c].viewingDistance.east = indexForMaxHeight[height] - c
+                (0..height).forEach { indexForMaxHeight[it] = c }
+            }
+        }
+    }
+    for (c in 0..<this.numCols) {
+        run { // Looking northward
+            val indexForMaxHeight = (0..9).map { 0 }.toCollection(ArrayList())
+            for (r in 0..<this.numRows) {
+                val height = this[r, c].height
+                this[r, c].viewingDistance.north = r - indexForMaxHeight[height]
+                (0..height).forEach { indexForMaxHeight[it] = r }
+            }
+        }
+        run { // Looking southward
+            val indexForMaxHeight = (0..9).map { this.numRows - 1 }.toCollection(ArrayList())
+            for (r in (0..<this.numRows).reversed()) {
+                val height = this[r, c].height
+                this[r, c].viewingDistance.south = indexForMaxHeight[height] - r
+                (0..height).forEach { indexForMaxHeight[it] = r }
+            }
         }
     }
 }
