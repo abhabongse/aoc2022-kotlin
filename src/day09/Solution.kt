@@ -4,6 +4,7 @@
 package day09
 
 import utils.FourDirection
+import utils.Vec2
 import java.io.File
 
 fun main() {
@@ -49,4 +50,23 @@ data class MoveInstruction(val direction: FourDirection, val count: Int) {
             return MoveInstruction(direction, count)
         }
     }
+
+    /**
+     * Produces a sequence of individual moves of the same [direction]
+     * for the [count] number of times.
+     */
+    fun iterator(): Sequence<FourDirection> {
+        val instr = this
+        return sequence {
+            repeat(instr.count) {
+                this.yield(instr.direction)
+            }
+        }
+    }
+}
+
+/**
+ * State of the rope, specifically the location of its [head] and [tail]
+ */
+data class RopeState(val head: Vec2, val tail: Vec2) {
 }

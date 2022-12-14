@@ -14,14 +14,14 @@ class Grid<T> private constructor(val numRows: Int, val numCols: Int, val data: 
     }
 
     operator fun get(index: GridIndex): T {
-        if (!this.isValidIndex(index)) {
+        if (!this.indexIsInBounds(index)) {
             throw IllegalArgumentException("index out of range: $index")
         }
         return this.data[index] ?: throw NoSuchElementException("value not set for index: $index")
     }
 
     operator fun set(index: GridIndex, value: T) {
-        if (!this.isValidIndex(index)) {
+        if (!this.indexIsInBounds(index)) {
             throw IllegalArgumentException("index out of range: $index")
         }
         this[index] = value
@@ -52,6 +52,12 @@ class Grid<T> private constructor(val numRows: Int, val numCols: Int, val data: 
         }.toString()
     }
 
+    /**
+     * Generates a sequence of grid items in the specified order.
+     * @param [axisMajor] Whether to use [GridAxisOrdering.ROW_MAJOR] or [GridAxisOrdering.COLUMN_MAJOR] ordering
+     * @param [rowDirection] Whether to traverse each row in [GridDirectionOrdering.ASCENDING] or [GridDirectionOrdering.DESCENDING] order
+     * @param [columnDirection] Whether to traverse each column in [GridDirectionOrdering.ASCENDING] or [GridDirectionOrdering.DESCENDING] order
+     */
     fun iterator(
         axisMajor: GridAxisOrdering = GridAxisOrdering.ROW_MAJOR,
         rowDirection: GridDirectionOrdering = GridDirectionOrdering.ASCENDING,
@@ -61,6 +67,12 @@ class Grid<T> private constructor(val numRows: Int, val numCols: Int, val data: 
             .map { this[it] }
     }
 
+    /**
+     * Generates a sequence of grid items along with indices in the specified order
+     * @param [axisMajor] Whether to use [GridAxisOrdering.ROW_MAJOR] or [GridAxisOrdering.COLUMN_MAJOR] ordering
+     * @param [rowDirection] Whether to traverse each row in [GridDirectionOrdering.ASCENDING] or [GridDirectionOrdering.DESCENDING] order
+     * @param [columnDirection] Whether to traverse each column in [GridDirectionOrdering.ASCENDING] or [GridDirectionOrdering.DESCENDING] order
+     */
     fun iteratorWithIndex(
         axisMajor: GridAxisOrdering = GridAxisOrdering.ROW_MAJOR,
         rowDirection: GridDirectionOrdering = GridDirectionOrdering.ASCENDING,
@@ -70,7 +82,10 @@ class Grid<T> private constructor(val numRows: Int, val numCols: Int, val data: 
             .map { GridIndexedValue(it, this[it]) }
     }
 
-    fun isValidIndex(index: GridIndex): Boolean {
+    /**
+     * Whether the given grid index lies within bounds of the grid
+     */
+    fun indexIsInBounds(index: GridIndex): Boolean {
         return index.r in 0 until this.numRows && index.c in 0 until this.numCols
     }
 
@@ -138,6 +153,8 @@ enum class GridDirectionOrdering {
 
 /**
  * Generates a sequence of zero-indexed position within a grid
+ *
+ * TODO: turns this into an iterable class
  */
 fun gridIndexSequence(
     numRows: Int,

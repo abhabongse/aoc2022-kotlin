@@ -67,90 +67,91 @@ private fun <T> Sequence<T>.largestWith(n: Int, comparator: Comparator<T>): List
  * using the given predicate to determine the separator.
  * See also: [more_itertools.split_at](https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.split_at)
  */
-inline fun <T> Sequence<T>.splitAt(crossinline predicate: (T) -> Boolean): Sequence<List<T>> {
-    val iterator = this.iterator()
-    return sequence {
-        var accmList: ArrayList<T> = arrayListOf()
-        for (item in iterator) {
-            if (predicate(item)) {
+inline fun <T> Sequence<T>.splitAt(crossinline predicate: (T) -> Boolean): Sequence<List<T>> =
+    this.iterator().let { iterator ->
+        sequence {
+            var accmList: ArrayList<T> = arrayListOf()
+            for (item in iterator) {
+                if (predicate(item)) {
+                    this.yield(accmList)
+                    accmList = arrayListOf()
+                } else {
+                    accmList.add(item)
+                }
+            }
+            if (accmList.isNotEmpty()) {
                 this.yield(accmList)
-                accmList = arrayListOf()
-            } else {
-                accmList.add(item)
             }
         }
-        if (accmList.isNotEmpty()) {
-            this.yield(accmList)
-        }
     }
-}
+
 
 /**
  * Splits the given iterator into multiple chunks
  * using the given predicate to determine the start of a new chunk.
  * See also: [more_itertools.split_before](https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.split_before)
  */
-inline fun <T> Sequence<T>.splitBefore(crossinline predicate: (T) -> Boolean): Sequence<List<T>> {
-    val iterator = this.iterator()
-    return sequence {
-        var accmList: ArrayList<T> = arrayListOf()
-        for (item in iterator) {
-            if (accmList.isNotEmpty() && predicate(item)) {
+inline fun <T> Sequence<T>.splitBefore(crossinline predicate: (T) -> Boolean): Sequence<List<T>> =
+    this.iterator().let { iterator ->
+        sequence {
+            var accmList: ArrayList<T> = arrayListOf()
+            for (item in iterator) {
+                if (accmList.isNotEmpty() && predicate(item)) {
+                    this.yield(accmList)
+                    accmList = arrayListOf()
+                }
+                accmList.add(item)
+            }
+            if (accmList.isNotEmpty()) {
                 this.yield(accmList)
-                accmList = arrayListOf()
             }
-            accmList.add(item)
-        }
-        if (accmList.isNotEmpty()) {
-            this.yield(accmList)
         }
     }
-}
 
 /**
  * Make an iterator that returns accumulated results of binary functions.
  * See also: [itertools.accumulate](https://docs.python.org/3/library/itertools.html#itertools.accumulate)
  */
-inline fun <T, R> Sequence<T>.accumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> {
-    var accm = initial
-    val iterator = this.iterator()
-    return sequence {
-        for (item in iterator) {
-            accm = operation(accm, item)
-            this.yield(accm)
+inline fun <T, R> Sequence<T>.accumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> =
+    this.iterator().let { iterator ->
+        sequence {
+            var accm = initial
+            for (item in iterator) {
+                accm = operation(accm, item)
+                this.yield(accm)
+            }
         }
     }
-}
 
 /**
  * Make an iterator that returns accumulated results of binary functions.
  * See also: [itertools.accumulate](https://docs.python.org/3/library/itertools.html#itertools.accumulate)
  */
-inline fun <T> Sequence<T>.accumulate(crossinline operation: (T, T) -> T): Sequence<T> {
-    var accm: T? = null
-    val iterator = this.iterator()
-    return sequence {
-        for ((index, item) in iterator.withIndex()) {
-            accm = if (index == 0) {
-                item
-            } else {
-                operation(accm!!, item)
+inline fun <T> Sequence<T>.accumulate(crossinline operation: (T, T) -> T): Sequence<T> =
+    this.iterator().let { iterator ->
+        return sequence {
+            var accm: T? = null
+            for ((index, item) in iterator.withIndex()) {
+                accm = if (index == 0) {
+                    item
+                } else {
+                    operation(accm!!, item)
+                }
+                this.yield(accm!!)
             }
-            this.yield(accm!!)
         }
     }
-}
 
 /**
  * Make an iterator that returns *delayed* accumulated results of binary functions.
  */
-inline fun <T, R> Sequence<T>.delayedAccumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> {
-    var accm = initial
-    val iterator = this.iterator()
-    return sequence {
-        for (item in iterator) {
-            this.yield(accm)
-            accm = operation(accm, item)
+inline fun <T, R> Sequence<T>.delayedAccumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> =
+    this.iterator().let { iterator ->
+        sequence {
+            var accm = initial
+            for (item in iterator) {
+                this.yield(accm)
+                accm = operation(accm, item)
+            }
         }
     }
-}
