@@ -39,18 +39,19 @@ class Grid<T> private constructor(val numRows: Int, val numCols: Int, val data: 
     /**
      * Special method to display grid with nice formatting.
      */
-    fun toDebugString(): String {
-        val grid = this
-        return StringBuilder().apply {
-            this.append("FixedGrid of ${grid.numRows} rows and ${grid.numCols} columns:\n")
-            (0 until grid.numRows).forEach { i ->
-                (0 until grid.numCols).forEach { j ->
-                    this.append("${grid[i, j]} ")
+    fun toDebugString(): String =
+        this.let { grid ->
+            StringBuilder().apply {
+                this.append("FixedGrid of ${grid.numRows} rows and ${grid.numCols} columns:\n")
+                for (i in 0 until grid.numRows) {
+                    for (j in 0 until grid.numCols) {
+                        this.append("  ${grid[i, j]}")
+                    }
+                    this.append("\n")
                 }
-                this.append("\n")
-            }
-        }.toString()
-    }
+            }.toString()
+        }
+
 
     /**
      * Generates a sequence of grid items in the specified order.

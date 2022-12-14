@@ -8,6 +8,7 @@ import day07.Command.ListDirectoryContent
 import day07.ListDirectoryResult.FileResult
 import day07.ListDirectoryResult.SubDirectory
 import utils.splitBefore
+import utils.thenOrNull
 import java.io.File
 
 fun main() {
@@ -66,22 +67,31 @@ data class History(val command: String, val results: List<String>) {
  * - [ChangeDirectory] for `cd` command
  */
 sealed class Command {
-    object ListDirectoryContent : Command()
-    class ChangeDirectory(val arg: String) : Command()
-
-    companion object {
-        infix fun fromString(string: String): Command {
-            val tokens = string.split("""\s+""".toRegex())
-            return if (tokens[0] == "ls" && tokens.size == 1) {
-                ListDirectoryContent
-            } else if (tokens[0] == "cd" && tokens.size == 2) {
-                ChangeDirectory(arg = tokens[1])
-            } else {
-                throw IllegalArgumentException("unknown command: $string")
-            }
+    class ListDirectoryContent() : Command() {
+        companion object {
+            infix fun fromString(string: String): ListDirectoryContent? =
+                (string.trim() == "ls").thenOrNull { ListDirectoryContent() }
         }
     }
+
+    data class ChangeDirectory(val arg: String) : Command() {
+        companion object {
+            val pattern = """cd (\S+)""".toRegex()
+            infix fun fromString(string: String): ChangeDirectory? =
+                pattern.matchEntire(string.trim())
+                    ?.destructured
+                    ?.let { (arg) -> ChangeDirectory(arg) }
+        }
+    }
+
+    companion object {
+        infix fun fromString(string: String): Command =
+            (ListDirectoryContent fromString string)
+                ?: (ChangeDirectory fromString string)
+                ?: throw IllegalArgumentException("unknown command: $string")
+    }
 }
+
 
 /**
  * Each line result for the [Command.ListDirectoryContent] command.
