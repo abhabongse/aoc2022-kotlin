@@ -5,22 +5,26 @@ package day09
 
 import utils.FourDirection
 import utils.Vec2
+import utils.accumulate
 import java.io.File
+import kotlin.math.sign
 
 fun main() {
     val fileName =
-        "day09_sample.txt"
-//        "day09_input.txt"
+//        "day09_sample_a.txt"
+//        "day09_sample_b.txt"
+        "day09_input.txt"
     val moveInstructions = readInput(fileName)
-    moveInstructions.forEachIndexed { index, moveInstruction -> println("$index, $moveInstruction") }
 
-    // Part 1: number of positions visited by rope tail
-    val p1VisitedPositions = 0
-    println("Part 1: $p1VisitedPositions")
+    // Part 1: rope with 2 knots
+    val p1RopeStates = simulateAndTrackRope(Rope.atOrigin(2), moveInstructions)
+    val p1TailSpots = p1RopeStates.map { it.tail }.toSet().size
+    println("Part 1: $p1TailSpots")
 
-    // Part 2: ...
-    val p2MatchedSize = 0
-    println("Part 2: $p2MatchedSize")
+    // Part 2: rope with 10 knots
+    val p2RopeStates = simulateAndTrackRope(Rope.atOrigin(10), moveInstructions)
+    val p2TailSpots = p2RopeStates.map { it.tail }.toSet().size
+    println("Part 2: $p2TailSpots")
 }
 
 /**
@@ -31,6 +35,16 @@ fun readInput(fileName: String): List<MoveInstruction> {
         .readLines()
         .map { MoveInstruction fromString it }
 }
+
+/**
+ * Simulates the experiment of moving the rope using the given instructions
+ * and tracks all possible rope states happened during the simulation.
+ */
+fun simulateAndTrackRope(initialRope: Rope, moveInstructions: List<MoveInstruction>): Sequence<Rope> =
+    moveInstructions
+        .asSequence()
+        .flatMap { it.iterator() }
+        .accumulate(initialRope) { currentState, direction -> currentState transitionBy direction }
 
 /**
  * Move instructions as appeared in input
@@ -66,7 +80,36 @@ data class MoveInstruction(val direction: FourDirection, val count: Int) {
 }
 
 /**
- * State of the rope, specifically the location of its [head] and [tail]
+ * The state of a rope represented by the list of location
+ * of each knot in the rope in that order from head to tail.
  */
-data class RopeState(val head: Vec2, val tail: Vec2) {
+data class Rope(val positions: List<Vec2>) {
+    companion object {
+        fun atOrigin(length: Int) = Rope(List(length) { Vec2.zero })
+    }
+
+    val head get() = this.positions.first()
+    val tail get() = this.positions.last()
+
+    /**
+     * Moves the current rope to the next state
+     * using the given direction instruction for the head knot.
+     */
+    infix fun transitionBy(headDirection: FourDirection): Rope {
+        val phantomHead = this.head + headDirection.value * 2
+        val newPositions = this.positions
+            .asSequence()
+            .accumulate(phantomHead) { newPrevPosition, oldCurrPosition ->
+                val gradient = (newPrevPosition - oldCurrPosition).let { diff ->
+                    if (diff.normMax() > 1) {
+                        Vec2(diff.x.sign, diff.y.sign)
+                    } else {
+                        Vec2.zero
+                    }
+                }
+                oldCurrPosition + gradient
+            }
+            .toList()
+        return Rope(newPositions)
+    }
 }
