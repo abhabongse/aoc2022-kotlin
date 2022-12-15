@@ -1,11 +1,15 @@
 package day02
 
-/** Strategy guide planned by the elf for a single round of Rock Paper Scissors. */
+/**
+ * Strategy guide planned by the elf for a single round of Rock Paper Scissors.
+ */
 data class RoundStrategyGuide(val first: Char, val second: Char) {
     companion object {
         private val pattern = """([ABC])\s+([XYZ])""".toRegex()
 
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): RoundStrategyGuide {
             val (first, second) = pattern.matchEntire(string.trim())
                 ?.destructured
@@ -14,7 +18,9 @@ data class RoundStrategyGuide(val first: Char, val second: Char) {
         }
     }
 
-    /** Opponent's action as decrypted from the first column of the strategy guide. */
+    /**
+     * Opponent's action as decrypted from the first column of the strategy guide.
+     */
     val opponentAction: Action
         get() = when (this.first) {
             'A' -> Action.ROCK

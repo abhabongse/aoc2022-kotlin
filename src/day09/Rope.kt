@@ -11,7 +11,9 @@ import kotlin.math.sign
  */
 data class Rope(val positions: List<Vec2>) {
     companion object {
-        /** Returns a new rope where all knots are at the point of origin. */
+        /**
+         * Returns a new rope where all knots are at the point of origin.
+         */
         fun atOrigin(length: Int) = Rope(List(length) { Vec2.zero })
     }
 

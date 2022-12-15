@@ -1,11 +1,15 @@
 package day04
 
-/** Represent one assignment pair of two integer ranges. */
+/**
+ * Represent one assignment pair of two integer ranges.
+ */
 data class AssignmentPair(val firstRange: IntRange, val secondRange: IntRange) {
     companion object {
         private val pattern = """(\d+)-(\d+),(\d+)-(\d+)""".toRegex()
 
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): AssignmentPair {
             val (firstStart, firstEnd, secondStart, secondEnd) = pattern.matchEntire(string.trim())
                 ?.destructured

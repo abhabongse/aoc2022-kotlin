@@ -35,13 +35,15 @@ fun readInput(fileName: String): List<AssignmentPair> {
         .toList()
 }
 
-/** Checks if this IntRange is a subset of the other IntRange. */
+/**
+ * Checks if this IntRange is a subset of the other [IntRange].
+ */
 infix fun IntRange.subset(other: IntRange): Boolean {
     return other.first <= this.first && this.last <= other.last
 }
 
 /**
- * Checks if this IntRange overlaps with the other IntRange
+ * Checks if this IntRange overlaps with the other [IntRange]
  * by at least one element.
  */
 infix fun IntRange.overlaps(other: IntRange): Boolean {

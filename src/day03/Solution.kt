@@ -33,7 +33,9 @@ fun main() {
     println("Part 2: $p2SumPriorities")
 }
 
-/** Reads and parses input data according to the problem statement. */
+/**
+ * Reads and parses input data according to the problem statement.
+ */
 fun readInput(fileName: String): List<Rucksack> {
     return File("inputs", fileName)
         .readLines()

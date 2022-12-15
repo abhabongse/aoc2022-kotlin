@@ -8,7 +8,9 @@ data class RearrangeOp(val count: Int, val source: Char, val dest: Char) {
     companion object {
         private val pattern = """move (\d+) from (\d) to (\d)""".toRegex()
 
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): RearrangeOp {
             val (count, source, dest) = pattern.matchEntire(string.trim())
                 ?.destructured

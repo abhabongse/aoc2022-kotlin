@@ -1,6 +1,8 @@
 package day07
 
-/** Path is represented by an immutable list of path components. */
+/**
+ * Path is represented by an immutable list of path components.
+ */
 @JvmInline
 value class Path(private val data: List<String>) {
     companion object {

@@ -7,7 +7,9 @@ import utils.FourDirection
  */
 data class MoveInstruction(val direction: FourDirection, val count: Int) {
     companion object {
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): MoveInstruction {
             val (dir, cnt) = string.trim().split("""\s+""".toRegex())
             val direction = when (dir.single()) {

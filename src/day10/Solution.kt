@@ -48,7 +48,9 @@ fun main() {
         }
 }
 
-/** Reads and parses input data according to the problem statement. */
+/**
+ * Reads and parses input data according to the problem statement.
+ */
 fun readInput(fileName: String): List<CpuInstruction> {
     return File("inputs", fileName)
         .readLines()

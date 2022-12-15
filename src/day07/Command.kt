@@ -10,7 +10,7 @@ import utils.thenOrNull
  * - [ChangeDirectory] for `cd` command
  */
 sealed class Command {
-    class ListDirectoryContent() : Command() {
+    class ListDirectoryContent : Command() {
         companion object {
             /** Creates an object by parsing the given [string]. */
             infix fun fromString(string: String): ListDirectoryContent? =

@@ -9,7 +9,9 @@ sealed class ListDirectoryResult {
     class FileResult(val name: String, val size: Int) : ListDirectoryResult()
 
     companion object {
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): ListDirectoryResult {
             val tokens = string.split("""\s+""".toRegex())
             return if (tokens.size != 2) {

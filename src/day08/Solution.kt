@@ -24,7 +24,9 @@ fun main() {
     println("Part 2: $p2BestScenicScore")
 }
 
-/** Reads and parses input data according to the problem statement. */
+/**
+ * Reads and parses input data according to the problem statement.
+ */
 fun readInput(fileName: String): Grid<Tree> {
     val data = File("inputs", fileName)
         .readLines()
@@ -32,7 +34,9 @@ fun readInput(fileName: String): Grid<Tree> {
     return Grid(data)
 }
 
-/** Populates the viewing block height data for each tree in all four directions. */
+/**
+ * Populates the viewing block height data for each tree in all four directions.
+ */
 @OptIn(ExperimentalStdlibApi::class)
 fun Grid<Tree>.populateViewingBlockHeight() {
     for (r in 0..<this.numRows) {

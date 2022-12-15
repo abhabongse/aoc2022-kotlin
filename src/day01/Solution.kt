@@ -26,7 +26,9 @@ fun main() {
     println("Part 2: $p2Calories")
 }
 
-/** Reads and parses input data according to the problem statement. */
+/**
+ * Reads and parses input data according to the problem statement.
+ */
 fun readInput(fileName: String): List<Elf> {
     return File("inputs", fileName)
         .readLines()

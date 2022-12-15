@@ -35,7 +35,9 @@ fun main() {
     println("Part 2: $p2MatchedSize")
 }
 
-/** Reads and parses input data according to the problem statement. */
+/**
+ * Reads and parses input data according to the problem statement.
+ */
 fun readInput(fileName: String): List<History> {
     return File("inputs", fileName)
         .readLines()

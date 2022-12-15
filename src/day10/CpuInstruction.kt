@@ -2,13 +2,18 @@ package day10
 
 import utils.thenOrNull
 
-/** CPU Instruction */
-sealed class CpuInstruction(val numCycles: Int) {
-
-    /** Represents noop instruction (do nothing) */
-    class Noop : CpuInstruction(1) {
+/**
+ * CPU Instruction
+ */
+sealed class CpuInstruction {
+    /**
+     * Represents noop instruction (do nothing)
+     */
+    class Noop : CpuInstruction() {
         companion object {
-            /** Creates an object by parsing the given [string]. */
+            /**
+             * Creates an object by parsing the given [string].
+             */
             infix fun fromString(string: String): Noop? =
                 (string.trim() == "noop").thenOrNull { Noop() }
         }
@@ -18,12 +23,16 @@ sealed class CpuInstruction(val numCycles: Int) {
         }
     }
 
-    /** Represents adding the literal value to the register X */
-    data class AddX(val value: Int) : CpuInstruction(2) {
+    /**
+     * Represents adding the literal value to the register X
+     */
+    data class AddX(val value: Int) : CpuInstruction() {
         companion object {
             val pattern = """addx (-?\d+)""".toRegex()
 
-            /** Creates an object by parsing the given [string]. */
+            /**
+             * Creates an object by parsing the given [string].
+             */
             infix fun fromString(string: String): AddX? =
                 pattern.matchEntire(string.trim())
                     ?.destructured
@@ -32,7 +41,9 @@ sealed class CpuInstruction(val numCycles: Int) {
     }
 
     companion object {
-        /** Creates an object by parsing the given [string]. */
+        /**
+         * Creates an object by parsing the given [string].
+         */
         infix fun fromString(string: String): CpuInstruction =
             (Noop fromString string)
                 ?: (AddX fromString string)

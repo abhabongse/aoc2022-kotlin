@@ -1,18 +1,24 @@
 package day02
 
-/** Possible actions for the game of Rock Paper Scissors. */
+/**
+ * Possible actions for the game of Rock Paper Scissors.
+ */
 enum class Action(val value: Int) {
     ROCK(0), PAPER(1), SCISSORS(2);
 
     companion object {
-        /** Reverse lookup for action enum object based of [value]. */
+        /**
+         * Reverse lookup for action enum object based of [value].
+         */
         infix fun from(value: Int): Action =
             Action.values()
                 .firstOrNull { it.value == value }
-                ?: throw IllegalArgumentException("unknown value for action: $value")
+                ?: throw IllegalArgumentException("unknown action: $value")
     }
 
-    /** Determines the outcome based on the action of two players. */
+    /**
+     * Determines the outcome based on the action of two players.
+     */
     infix fun playAgainst(opponent: Action): Outcome =
         Outcome from Math.floorMod(this.value - opponent.value, 3)
 }
@@ -26,7 +32,9 @@ enum class Outcome(val value: Int) {
     WIN(1), DRAW(0), LOSE(2);
 
     companion object {
-        /** Reverse lookup for outcome enum object based of [value]. */
+        /**
+         * Reverse lookup for outcome enum object based of [value].
+         */
         infix fun from(value: Int): Outcome =
             Outcome.values()
                 .firstOrNull { it.value == value }
