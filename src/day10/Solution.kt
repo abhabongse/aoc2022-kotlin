@@ -6,6 +6,7 @@ package day10
 import utils.accumulate
 import utils.thenOrNull
 import java.io.File
+import kotlin.math.absoluteValue
 
 fun main() {
     val fileName =
@@ -29,8 +30,23 @@ fun main() {
     println("Part 1: $p1SumSignalStrengths")
 
     // Part 2:
-    val p2TailSpots = 0
-    println("Part 2: $p2TailSpots")
+    println("Part 2: (see below)")
+    signalStrengthsByCycle
+        .subList(0, 240)
+        .asSequence()
+        .chunked(40)
+        .forEach { list ->
+            list.withIndex()
+                .forEach { (pixelColumn, regX) ->
+                    val char = if ((regX - pixelColumn).absoluteValue <= 1) {
+                        '#'
+                    } else {
+                        '.'
+                    }
+                    print(char)
+                }
+            println()
+        }
 }
 
 /**
