@@ -3,6 +3,21 @@ package utils
 import java.util.*
 
 /**
+ * Chain multiple sequences together.
+ */
+fun <T> Sequence<T>.chain(other: Sequence<T>): Sequence<T> =
+    this.iterator().let { iterator ->
+        sequence {
+            for (item in iterator) {
+                this.yield(item)
+            }
+            for (item in other.iterator()) {
+                this.yield(item)
+            }
+        }
+    }
+
+/**
  * Find [n] smallest items from the sequence.
  * The result is returned in the sorted descending order.
  */
@@ -112,10 +127,17 @@ inline fun <T> Sequence<T>.splitBefore(crossinline predicate: (T) -> Boolean): S
  * Make an iterator that returns accumulated results of binary functions.
  * See also: [itertools.accumulate](https://docs.python.org/3/library/itertools.html#itertools.accumulate)
  */
-inline fun <T, R> Sequence<T>.accumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> =
+inline fun <T, R> Sequence<T>.accumulate(
+    initial: R,
+    includeInitial: Boolean = false,
+    crossinline operation: (R, T) -> R
+): Sequence<R> =
     this.iterator().let { iterator ->
         sequence {
-            var accm = initial
+            var accm: R = initial
+            if (includeInitial) {
+                this.yield(accm)
+            }
             for (item in iterator) {
                 accm = operation(accm, item)
                 this.yield(accm)
@@ -131,27 +153,13 @@ inline fun <T> Sequence<T>.accumulate(crossinline operation: (T, T) -> T): Seque
     this.iterator().let { iterator ->
         return sequence {
             var accm: T? = null
-            for ((index, item) in iterator.withIndex()) {
-                accm = if (index == 0) {
+            for (item in iterator) {
+                accm = if (accm == null) {
                     item
                 } else {
-                    operation(accm!!, item)
+                    operation(accm, item)
                 }
-                this.yield(accm!!)
-            }
-        }
-    }
-
-/**
- * Make an iterator that returns *delayed* accumulated results of binary functions.
- */
-inline fun <T, R> Sequence<T>.delayedAccumulate(initial: R, crossinline operation: (R, T) -> R): Sequence<R> =
-    this.iterator().let { iterator ->
-        sequence {
-            var accm = initial
-            for (item in iterator) {
                 this.yield(accm)
-                accm = operation(accm, item)
             }
         }
     }

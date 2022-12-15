@@ -3,20 +3,29 @@
  */
 package day10
 
+import utils.accumulate
 import utils.thenOrNull
-import utils.toDebugString
 import java.io.File
 
 fun main() {
     val fileName =
 //        "day10_sample_a.txt"
-        "day10_sample_b.txt"
-//        "day10_input.txt"
+//        "day10_sample_b.txt"
+        "day10_input.txt"
     val cpuInstructions = readInput(fileName)
-    print(cpuInstructions.toDebugString())
 
-    // Part 1:
-    val p1SumSignalStrengths = 0
+    // Part 1: signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles
+    val signalStrengthsByCycle = cpuInstructions
+        .asSequence()
+        .flatMap {
+            when (it) {
+                is CpuInstruction.Noop -> listOf(0)
+                is CpuInstruction.AddX -> listOf(0, it.value)
+            }
+        }
+        .accumulate(1, includeInitial = true) { acc, gradient -> acc + gradient }
+        .toList()
+    val p1SumSignalStrengths = listOf(20, 60, 100, 140, 180, 220).sumOf { it * signalStrengthsByCycle[it - 1] }
     println("Part 1: $p1SumSignalStrengths")
 
     // Part 2:
