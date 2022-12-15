@@ -5,7 +5,7 @@ package day07
 
 import day07.Command.ChangeDirectory
 import day07.Command.ListDirectoryContent
-import day07.ListDirectoryResult.FileResult
+import day07.Command.ListDirectoryContent.ListDirectoryResult
 import utils.splitBefore
 import java.io.File
 
@@ -68,7 +68,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
             is ListDirectoryContent -> {
                 for (historyResult in history.results) {
                     val result = ListDirectoryResult fromString historyResult
-                    if (result is FileResult) {
+                    if (result is ListDirectoryResult.FileResult) {
                         val path = workingDir + result.name
                         fileSizes.add(Pair(path, result.size))
                     }
