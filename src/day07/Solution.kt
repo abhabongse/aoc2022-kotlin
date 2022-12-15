@@ -6,9 +6,7 @@ package day07
 import day07.Command.ChangeDirectory
 import day07.Command.ListDirectoryContent
 import day07.ListDirectoryResult.FileResult
-import day07.ListDirectoryResult.SubDirectory
 import utils.splitBefore
-import utils.thenOrNull
 import java.io.File
 
 fun main() {
@@ -37,9 +35,7 @@ fun main() {
     println("Part 2: $p2MatchedSize")
 }
 
-/**
- * Reads and parses input data according to the problem statement.
- */
+/** Reads and parses input data according to the problem statement. */
 fun readInput(fileName: String): List<History> {
     return File("inputs", fileName)
         .readLines()
@@ -48,86 +44,6 @@ fun readInput(fileName: String): List<History> {
         .splitBefore { it.startsWith("$ ") }
         .map { lines -> History fromString lines }
         .toList()
-}
-
-/**
- * A single command history entry consisting of the unparsed [command] string
- * and the list of unparsed [results].
- */
-data class History(val command: String, val results: List<String>) {
-    companion object {
-        infix fun fromString(lines: List<String>): History =
-            History(command = lines[0].removePrefix("$ "), results = lines.drop(1))
-    }
-}
-
-/**
- * A command type consisting of two subtypes:
- * - [ListDirectoryContent] for `ls` command
- * - [ChangeDirectory] for `cd` command
- */
-sealed class Command {
-    class ListDirectoryContent() : Command() {
-        companion object {
-            infix fun fromString(string: String): ListDirectoryContent? =
-                (string.trim() == "ls").thenOrNull { ListDirectoryContent() }
-        }
-    }
-
-    data class ChangeDirectory(val arg: String) : Command() {
-        companion object {
-            val pattern = """cd (\S+)""".toRegex()
-            infix fun fromString(string: String): ChangeDirectory? =
-                pattern.matchEntire(string.trim())
-                    ?.destructured
-                    ?.let { (arg) -> ChangeDirectory(arg) }
-        }
-    }
-
-    companion object {
-        infix fun fromString(string: String): Command =
-            (ListDirectoryContent fromString string)
-                ?: (ChangeDirectory fromString string)
-                ?: throw IllegalArgumentException("unknown command: $string")
-    }
-}
-
-
-/**
- * Each line result for the [Command.ListDirectoryContent] command.
- * Two possible subtypes: a [SubDirectory] or a [FileResult].
- */
-sealed class ListDirectoryResult {
-    class SubDirectory(val name: String) : ListDirectoryResult()
-    class FileResult(val name: String, val size: Int) : ListDirectoryResult()
-
-    companion object {
-        infix fun fromString(string: String): ListDirectoryResult {
-            val tokens = string.split("""\s+""".toRegex())
-            return if (tokens.size != 2) {
-                throw IllegalArgumentException("unknown command: $string")
-            } else if (tokens[0] == "dir") {
-                SubDirectory(name = tokens[1])
-            } else {
-                FileResult(name = tokens[1], size = tokens[0].toInt())
-            }
-        }
-    }
-}
-
-/**
- * Path is represented by an immutable list of path components.
- */
-@JvmInline
-value class Path(private val data: List<String>) {
-    companion object {
-        val root = Path(emptyList())
-    }
-
-    val parent get() = Path(this.data.dropLast(1))
-    operator fun plus(name: String) = Path(this.data + listOf(name))
-    fun isRoot() = this == root
-    fun isNotRoot() = this != root
 }
 
 /**

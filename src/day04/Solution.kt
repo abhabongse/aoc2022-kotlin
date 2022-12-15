@@ -35,23 +35,7 @@ fun readInput(fileName: String): List<AssignmentPair> {
         .toList()
 }
 
-data class AssignmentPair(val firstRange: IntRange, val secondRange: IntRange) {
-    companion object {
-        private val pattern = """(\d+)-(\d+),(\d+)-(\d+)""".toRegex()
-        infix fun fromString(string: String): AssignmentPair {
-            val (firstStart, firstEnd, secondStart, secondEnd) = pattern.matchEntire(string.trim())
-                ?.destructured
-                ?: throw IllegalArgumentException("invalid input line: $string")
-            val firstRange = firstStart.toInt()..firstEnd.toInt()
-            val secondRange = secondStart.toInt()..secondEnd.toInt()
-            return AssignmentPair(firstRange, secondRange)
-        }
-    }
-}
-
-/**
- * Checks if this IntRange is a subset of the other IntRange.
- */
+/** Checks if this IntRange is a subset of the other IntRange. */
 infix fun IntRange.subset(other: IntRange): Boolean {
     return other.first <= this.first && this.last <= other.last
 }

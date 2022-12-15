@@ -24,9 +24,7 @@ fun main() {
     println("Part 2: $p2FirstMarker")
 }
 
-/**
- * Reads and parses input data according to the problem statement.
- */
+/** Reads and parses input data according to the problem statement. */
 fun readInput(fileName: String): String {
     return File("inputs", fileName).readText().trim()
 }

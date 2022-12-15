@@ -3,11 +3,8 @@
  */
 package day09
 
-import utils.FourDirection
-import utils.Vec2
 import utils.accumulate
 import java.io.File
-import kotlin.math.sign
 
 fun main() {
     val fileName =
@@ -45,71 +42,3 @@ fun simulateAndTrackRope(initialRope: Rope, moveInstructions: List<MoveInstructi
         .asSequence()
         .flatMap { it.iterator() }
         .accumulate(initialRope) { currentState, direction -> currentState transitionBy direction }
-
-/**
- * Move instructions as appeared in input
- */
-data class MoveInstruction(val direction: FourDirection, val count: Int) {
-    companion object {
-        infix fun fromString(string: String): MoveInstruction {
-            val (dir, cnt) = string.trim().split("""\s+""".toRegex())
-            val direction = when (dir.single()) {
-                'U' -> FourDirection.NORTH
-                'D' -> FourDirection.SOUTH
-                'L' -> FourDirection.WEST
-                'R' -> FourDirection.EAST
-                else -> throw IllegalArgumentException("unknown direction: $dir")
-            }
-            val count = cnt.toInt()
-            return MoveInstruction(direction, count)
-        }
-    }
-
-    /**
-     * Produces a sequence of individual moves of the same [direction]
-     * for the [count] number of times.
-     */
-    fun iterator(): Sequence<FourDirection> {
-        val instr = this
-        return sequence {
-            repeat(instr.count) {
-                this.yield(instr.direction)
-            }
-        }
-    }
-}
-
-/**
- * The state of a rope represented by the list of location
- * of each knot in the rope in that order from head to tail.
- */
-data class Rope(val positions: List<Vec2>) {
-    companion object {
-        fun atOrigin(length: Int) = Rope(List(length) { Vec2.zero })
-    }
-
-    val head get() = this.positions.first()
-    val tail get() = this.positions.last()
-
-    /**
-     * Moves the current rope to the next state
-     * using the given direction instruction for the head knot.
-     */
-    infix fun transitionBy(headDirection: FourDirection): Rope {
-        val phantomHead = this.head + headDirection.value * 2
-        val newPositions = this.positions
-            .asSequence()
-            .accumulate(phantomHead) { newPrevPosition, oldCurrPosition ->
-                val gradient = (newPrevPosition - oldCurrPosition).let { diff ->
-                    if (diff.normMax() > 1) {
-                        Vec2(diff.x.sign, diff.y.sign)
-                    } else {
-                        Vec2.zero
-                    }
-                }
-                oldCurrPosition + gradient
-            }
-            .toList()
-        return Rope(newPositions)
-    }
-}

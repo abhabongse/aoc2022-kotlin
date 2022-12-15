@@ -24,9 +24,7 @@ fun main() {
     println("Part 2: $p2BestScenicScore")
 }
 
-/**
- * Reads and parses input data according to the problem statement.
- */
+/** Reads and parses input data according to the problem statement. */
 fun readInput(fileName: String): Grid<Tree> {
     val data = File("inputs", fileName)
         .readLines()
@@ -34,35 +32,7 @@ fun readInput(fileName: String): Grid<Tree> {
     return Grid(data)
 }
 
-/**
- * Data for each cardinal direction.
- */
-data class FourDirections<T>(var north: T, var south: T, var west: T, var east: T)
-
-/**
- * Information about the viewing block height and the viewing distance for a tree
- * toward each of the four cardinal directions.
- */
-class Tree(internal val height: Int) {
-    internal var viewingBlockHeight: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
-    internal var viewingDistance: FourDirections<Int> = FourDirections(-1, -1, -1, -1)
-
-    val visibleFromOneDirection
-        get() = this.height > this.viewingBlockHeight.north ||
-                this.height > this.viewingBlockHeight.south ||
-                this.height > this.viewingBlockHeight.west ||
-                this.height > this.viewingBlockHeight.east
-
-    val scenicScore
-        get() = this.viewingDistance.north *
-                this.viewingDistance.south *
-                this.viewingDistance.west *
-                this.viewingDistance.east
-}
-
-/**
- * Populates the viewing block height data for each tree in all four directions.
- */
+/** Populates the viewing block height data for each tree in all four directions. */
 @OptIn(ExperimentalStdlibApi::class)
 fun Grid<Tree>.populateViewingBlockHeight() {
     for (r in 0..<this.numRows) {

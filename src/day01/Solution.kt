@@ -26,9 +26,7 @@ fun main() {
     println("Part 2: $p2Calories")
 }
 
-/**
- * Reads and parses input data according to the problem statement.
- */
+/** Reads and parses input data according to the problem statement. */
 fun readInput(fileName: String): List<Elf> {
     return File("inputs", fileName)
         .readLines()
@@ -37,8 +35,3 @@ fun readInput(fileName: String): List<Elf> {
         .map { caloriesGroup -> Elf(caloriesGroup.map(String::toInt)) }
         .toList()
 }
-
-/**
- * An elf represents a list of items [calories] that it carries around
- */
-data class Elf(val calories: List<Int>)

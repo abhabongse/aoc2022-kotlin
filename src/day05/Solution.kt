@@ -66,44 +66,8 @@ fun readInput(fileName: String): Input {
     return Input(view, stackLabelOrder, rearrangeOps)
 }
 
+/** Represents data loaded from the input file. */
 data class Input(val view: View, val stackLabelOrder: StackLabelOrder, val rearrangeOps: List<RearrangeOp>)
-
-/**
- * A view representing the crate stacking configuration.
- */
-typealias View = HashMap<Char, ArrayDeque<Char>>
-
-/**
- * Creates a deep copy of the view.
- */
-fun View.copy(): View {
-    val view: View = hashMapOf()
-    this.entries.forEach {
-        view[it.key] = ArrayDeque(it.value)
-    }
-    return view
-}
-
-/**
- * A list representing the original ordering of stack labels.
- */
-typealias StackLabelOrder = List<Char>
-
-/**
- * A rearrangement operation to move the given [count] of crates
- * from the [source] stack pile to the [dest] stack pile.
- */
-data class RearrangeOp(val count: Int, val source: Char, val dest: Char) {
-    companion object {
-        private val pattern = """move (\d+) from (\d) to (\d)""".toRegex()
-        infix fun fromString(string: String): RearrangeOp {
-            val (count, source, dest) = pattern.matchEntire(string.trim())
-                ?.destructured
-                ?: throw IllegalArgumentException("invalid input line: $string")
-            return RearrangeOp(count.toInt(), source.single(), dest.single())
-        }
-    }
-}
 
 /**
  * Simulates CrateMover 9000: moves one crate at a time.

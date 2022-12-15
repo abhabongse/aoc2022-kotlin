@@ -33,41 +33,11 @@ fun main() {
     println("Part 2: $p2SumPriorities")
 }
 
-/**
- * Reads and parses input data according to the problem statement.
- */
-fun readInput(fileName: String): List<RoundStrategy> {
+/** Reads and parses input data according to the problem statement. */
+fun readInput(fileName: String): List<Rucksack> {
     return File("inputs", fileName)
         .readLines()
         .asSequence()
-        .map { RoundStrategy(it.trim()) }
+        .map { Rucksack(it.trim()) }
         .toList()
-}
-
-data class RoundStrategy(val content: String) {
-    val firstCompartment: String
-        get() {
-            val length = this.content.length
-            return this.content.slice(0 until length / 2)
-        }
-    val secondCompartment: String
-        get() {
-            val length = this.content.length
-            return this.content.slice(length / 2 until length)
-        }
-}
-
-/**
- * Priority based on the given item type.
- */
-object ItemPriority {
-    private const val itemTypes = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    fun lookup(char: Char): Int {
-        val index = itemTypes.indexOf(char)
-        return if (index > 0) {
-            index
-        } else {
-            throw IllegalArgumentException("invalid item type: $char")
-        }
-    }
 }
