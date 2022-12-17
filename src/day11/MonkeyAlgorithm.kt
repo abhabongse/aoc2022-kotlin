@@ -5,7 +5,7 @@ package day11
  * how it manipulates the worry level for each item,
  * and how it throws to other monkey fitting a certain criterion.
  */
-data class MonkeyAlgorithm(val modifyOperation: ModifyOperation, val throwOperation: ThrowOperation) {
+data class MonkeyAlgorithm(val modifyAction: ModifyAction, val throwAction: ThrowAction) {
 
     /**
      * The result from applying the monkey algorithm to an item.
