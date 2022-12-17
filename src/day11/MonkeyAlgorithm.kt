@@ -12,13 +12,13 @@ data class MonkeyAlgorithm(val modifyAction: ModifyAction, val throwAction: Thro
      * telling which [nextMonkeyNo] will have the chance to play with the item
      * in the next round.
      */
-    data class Result(val worryLevel: Int, val nextMonkeyNo: Int)
+    data class Result(val worryLevel: Long, val nextMonkeyNo: Int)
 
     /**
      * Applies the monkey algorithm to the item with the given initial [oldItem] worry level.
      */
-    fun apply(oldItem: Int): Result {
-        val newItem = this.modifyAction.modifyItem(oldItem) / 3
+    fun apply(oldItem: Long, discountRatio: Long = 1): Result {
+        val newItem = this.modifyAction.modifyItem(oldItem) / discountRatio
         val nextMonkeyNo = this.throwAction.findNextMonkey(newItem)
         return Result(newItem, nextMonkeyNo)
     }

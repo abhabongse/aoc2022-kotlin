@@ -12,11 +12,11 @@ data class ModifyAction(val left: Term, val op: MathOp, val right: Term) {
      */
     sealed class Term {
         /** Expression evaluation function. */
-        abstract fun eval(oldItem: Int): Int
+        abstract fun eval(oldItem: Long): Long
 
         /** Number term */
-        data class Number(val value: Int) : Term() {
-            override fun eval(oldItem: Int): Int = value
+        data class Number(val value: Long) : Term() {
+            override fun eval(oldItem: Long): Long = value
         }
 
         /** Input variable name */
@@ -25,13 +25,13 @@ data class ModifyAction(val left: Term, val op: MathOp, val right: Term) {
                 (this.name == "old").otherwiseThrow { IllegalArgumentException("unknown variable name ${this.name}") }
             }
 
-            override fun eval(oldItem: Int): Int = oldItem
+            override fun eval(oldItem: Long): Long = oldItem
         }
 
         companion object {
             /** Creates an object by parsing the given [string]. */
             infix fun from(string: String): Term =
-                string.toIntOrNull()?.let { Number(it) } ?: InputVar(string)
+                string.toLongOrNull()?.let { Number(it) } ?: InputVar(string)
         }
     }
 
@@ -69,7 +69,7 @@ data class ModifyAction(val left: Term, val op: MathOp, val right: Term) {
     /**
      * Modifies the worry level of a given item according to the operation
      */
-    fun modifyItem(oldItem: Int): Int {
+    fun modifyItem(oldItem: Long): Long {
         val left = this.left.eval(oldItem)
         val right = this.right.eval(oldItem)
         return when (this.op) {

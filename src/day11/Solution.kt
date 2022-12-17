@@ -3,7 +3,8 @@
  */
 package day11
 
-import utils.largestBy
+import utils.MathUtil
+import utils.largest
 import utils.otherwiseThrow
 import utils.splitAt
 import java.io.File
@@ -14,39 +15,46 @@ fun main() {
         "day11_input.txt"
     val (monkeyAlgorithms, itemQueues) = readInput(fileName)
 
-    // Part 1:
-    repeat(20) {
-        itemQueues.withIndex().forEach { (monkeyNo, itemQueue) ->
-            while (itemQueue.isNotEmpty()) {
-                val item = itemQueue.dequeue()
-                val (modifiedItem, nextMonkeyNo) = monkeyAlgorithms[monkeyNo].apply(item)
-                itemQueues[nextMonkeyNo].enqueue(modifiedItem)
-            }
-        }
+    // Part 1: 20 rounds, discount rate = 3
+    run {
+        val itemQueues = itemQueues.clone()
+        repeat(20) { simulateRound(monkeyAlgorithms, itemQueues, 3L) }
+        val p1MonkeyBusinessLevel = itemQueues
+            .asSequence()
+            .map { it.popFrontCount }
+            .largest(2)
+            .let { (fst, snd) -> fst * snd }
+        println("Part 1: $p1MonkeyBusinessLevel")
     }
-    val p1MonkeyBusiness = itemQueues
-        .asSequence()
-        .map { it.dequeueCount }
-        .largestBy(2) { it }
-        .let { (fst, snd) -> fst * snd }
-    println("Part 1: $p1MonkeyBusiness")
 
-    // Part 2:
-    val p2MonkeyBusiness = 0
-    println("Part 1: $p2MonkeyBusiness")
+    // Part 2: 10_000 rounds, no discount rate
+    run {
+        val modulus = monkeyAlgorithms.map { it.throwAction.testDivisibleBy }.let(MathUtil::lcm)
+        val itemQueues = itemQueues.clone()
+        repeat(10_000) {
+            simulateRound(monkeyAlgorithms, itemQueues)
+            itemQueues.forEach { it.resetMod(modulus) }
+        }
+        val p2MonkeyBusinessLevel = itemQueues
+            .asSequence()
+            .map { it.popFrontCount }
+            .largest(2)
+            .let { (fst, snd) -> fst.toLong() * snd.toLong() }
+        println("Part 2: $p2MonkeyBusinessLevel")
+    }
 }
 
 /** Reads and parses input data according to the problem statement. */
 fun readInput(fileName: String): Pair<List<MonkeyAlgorithm>, List<ItemQueue>> {
     val monkeyAlgorithms: ArrayList<MonkeyAlgorithm> = arrayListOf()
     val itemQueues: ArrayList<ItemQueue> = arrayListOf()
-
     val lineGroups = File("inputs", fileName)
         .readLines()
         .asSequence()
         .map { it.trim() }
         .splitAt { it.isEmpty() }
 
+    // Process each monkey information
     for ((monkeyNo, lines) in lineGroups.withIndex()) {
         (monkeyNo == parseMonkeyNo(lines[0]))
             .otherwiseThrow { IllegalArgumentException("unmatched monkey number") }
@@ -54,6 +62,7 @@ fun readInput(fileName: String): Pair<List<MonkeyAlgorithm>, List<ItemQueue>> {
         val modifyAction = ModifyAction from lines[2]
         val throwAction = ThrowAction.from(lines[3], lines[4], lines[5])
         val monkeyAlgorithm = MonkeyAlgorithm(modifyAction, throwAction)
+
         monkeyAlgorithms.add(monkeyAlgorithm)
         itemQueues.add(initialItemQueue)
     }
@@ -71,4 +80,18 @@ fun parseMonkeyNo(string: String): Int {
         ?.destructured
         ?: throw IllegalArgumentException("invalid monkey number format: $string")
     return monkeyNo.toInt()
+}
+
+/**
+ * Simulates a round of monkey throwing items around.
+ * The variable [itemQueues] will be modified in-place.
+ */
+fun simulateRound(monkeyAlgorithms: List<MonkeyAlgorithm>, itemQueues: List<ItemQueue>, discountRatio: Long = 1) {
+    for ((monkeyNo, itemQueue) in itemQueues.withIndex()) {
+        while (itemQueue.isNotEmpty()) {
+            val item = itemQueue.popFront()
+            val (modifiedItem, nextMonkeyNo) = monkeyAlgorithms[monkeyNo].apply(item, discountRatio)
+            itemQueues[nextMonkeyNo].pushBack(modifiedItem)
+        }
+    }
 }
