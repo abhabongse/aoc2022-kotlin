@@ -6,7 +6,6 @@ package day11
  * and how it throws to other monkey fitting a certain criterion.
  */
 data class MonkeyAlgorithm(val modifyAction: ModifyAction, val throwAction: ThrowAction) {
-
     /**
      * The result from applying the monkey algorithm to an item.
      * Specifically it determines the final [worryLevel] as well as
@@ -16,9 +15,11 @@ data class MonkeyAlgorithm(val modifyAction: ModifyAction, val throwAction: Thro
     data class Result(val worryLevel: Int, val nextMonkeyNo: Int)
 
     /**
-     * Applies the monkey algorithm to the item with the given initial [worryLevel].
+     * Applies the monkey algorithm to the item with the given initial [oldItem] worry level.
      */
-    fun apply(worryLevel: Int): Result {
-        TODO()
+    fun apply(oldItem: Int): Result {
+        val newItem = this.modifyAction.modifyItem(oldItem) / 3
+        val nextMonkeyNo = this.throwAction.findNextMonkey(newItem)
+        return Result(newItem, nextMonkeyNo)
     }
 }
