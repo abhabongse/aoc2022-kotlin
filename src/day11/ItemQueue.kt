@@ -1,9 +1,11 @@
 package day11
 
 /**
- * An item queue handled by a particular monkey.
+ * An item queue for a particular monkey
+ * where the value reflects the worry level of such item.
  */
 data class ItemQueue(var queue: ArrayDeque<Long>) {
+    /** The number of times the item is popped from the queue. */
     var popFrontCount = 0
         private set
 

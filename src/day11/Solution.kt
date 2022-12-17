@@ -15,7 +15,7 @@ fun main() {
         "day11_input.txt"
     val (monkeyAlgorithms, itemQueues) = readInput(fileName)
 
-    // Part 1: 20 rounds, discount rate = 3
+    // Part 1: simulate 20 rounds, with discount rate of worry level = 3
     run {
         val itemQueues = itemQueues.clone()
         repeat(20) { simulateRound(monkeyAlgorithms, itemQueues, 3L) }
@@ -27,10 +27,10 @@ fun main() {
         println("Part 1: $p1MonkeyBusinessLevel")
     }
 
-    // Part 2: 10_000 rounds, no discount rate
+    // Part 2: simulate 10_000 rounds, no discount rate of worry level
     run {
-        val modulus = monkeyAlgorithms.map { it.throwAction.testDivisibleBy }.let(MathUtil::lcm)
         val itemQueues = itemQueues.clone()
+        val modulus = monkeyAlgorithms.map { it.throwAction.testDivisibleBy }.let(MathUtil::lcm)
         repeat(10_000) {
             simulateRound(monkeyAlgorithms, itemQueues)
             itemQueues.forEach { it.resetMod(modulus) }
