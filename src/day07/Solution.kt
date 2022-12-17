@@ -44,7 +44,7 @@ fun readInput(fileName: String): List<History> {
         .asSequence()
         .map { it.trim() }
         .splitBefore { it.startsWith("$ ") }
-        .map { lines -> History fromString lines }
+        .map { lines -> History from lines }
         .toList()
 }
 
@@ -56,7 +56,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
     val fileSizes: ArrayList<Pair<Path, Int>> = ArrayList()
     var workingDir = Path.root
     for (history in histories) {
-        when (val command = Command fromString history.command) {
+        when (val command = Command from history.command) {
             is ChangeDirectory -> {
                 workingDir = when (command.arg) {
                     ".." -> workingDir.parent
@@ -67,7 +67,7 @@ fun listFileSizes(histories: List<History>): List<Pair<Path, Int>> {
 
             is ListDirectoryContent -> {
                 for (historyResult in history.results) {
-                    val result = ListDirectoryResult fromString historyResult
+                    val result = ListDirectoryResult from historyResult
                     if (result is ListDirectoryResult.FileResult) {
                         val path = workingDir + result.name
                         fileSizes.add(Pair(path, result.size))

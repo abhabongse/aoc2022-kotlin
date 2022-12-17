@@ -7,7 +7,7 @@ package day07
 data class History(val command: String, val results: List<String>) {
     companion object {
         /** Creates an object by parsing the given [lines] of string. */
-        infix fun fromString(lines: List<String>): History =
+        infix fun from(lines: List<String>): History =
             History(command = lines[0].removePrefix("$ "), results = lines.drop(1))
     }
 }

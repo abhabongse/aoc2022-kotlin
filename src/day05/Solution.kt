@@ -60,7 +60,7 @@ fun readInput(fileName: String): Input {
     val rearrangeOps = lines
         .subList(crateStackingLineCount, lines.size)
         .dropWhile { it.trim().isEmpty() }
-        .map { RearrangeOp fromString it }
+        .map { RearrangeOp from it }
         .toList()
 
     return Input(view, stackLabelOrder, rearrangeOps)

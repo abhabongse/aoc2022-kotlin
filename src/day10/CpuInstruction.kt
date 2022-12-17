@@ -14,7 +14,7 @@ sealed class CpuInstruction {
             /**
              * Creates an object by parsing the given [string].
              */
-            infix fun fromString(string: String): Noop? =
+            infix fun from(string: String): Noop? =
                 (string.trim() == "noop").thenOrNull { Noop() }
         }
 
@@ -28,12 +28,12 @@ sealed class CpuInstruction {
      */
     data class AddX(val value: Int) : CpuInstruction() {
         companion object {
-            val pattern = """addx (-?\d+)""".toRegex()
+            private val pattern = """addx (-?\d+)""".toRegex()
 
             /**
              * Creates an object by parsing the given [string].
              */
-            infix fun fromString(string: String): AddX? =
+            infix fun from(string: String): AddX? =
                 pattern.matchEntire(string.trim())
                     ?.destructured
                     ?.let { (value) -> AddX(value.toInt()) }
@@ -44,9 +44,9 @@ sealed class CpuInstruction {
         /**
          * Creates an object by parsing the given [string].
          */
-        infix fun fromString(string: String): CpuInstruction =
-            (Noop fromString string)
-                ?: (AddX fromString string)
+        infix fun from(string: String): CpuInstruction =
+            (Noop from string)
+                ?: (AddX from string)
                 ?: throw IllegalArgumentException("unknown instruction: $string")
     }
 }

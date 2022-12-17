@@ -30,6 +30,6 @@ fun readInput(fileName: String): List<RoundStrategyGuide> {
     return File("inputs", fileName)
         .readLines()
         .asSequence()
-        .map { RoundStrategyGuide fromString it }
+        .map { RoundStrategyGuide from it }
         .toList()
 }

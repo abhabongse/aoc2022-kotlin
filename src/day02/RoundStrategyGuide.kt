@@ -10,7 +10,7 @@ data class RoundStrategyGuide(val first: Char, val second: Char) {
         /**
          * Creates an object by parsing the given [string].
          */
-        infix fun fromString(string: String): RoundStrategyGuide {
+        infix fun from(string: String): RoundStrategyGuide {
             val (first, second) = pattern.matchEntire(string.trim())
                 ?.destructured
                 ?: throw IllegalArgumentException("invalid input line: $string")

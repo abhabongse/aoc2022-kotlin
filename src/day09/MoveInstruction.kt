@@ -10,7 +10,7 @@ data class MoveInstruction(val direction: FourDirection, val count: Int) {
         /**
          * Creates an object by parsing the given [string].
          */
-        infix fun fromString(string: String): MoveInstruction {
+        infix fun from(string: String): MoveInstruction {
             val (dir, cnt) = string.trim().split("""\s+""".toRegex())
             val direction = when (dir.single()) {
                 'U' -> FourDirection.NORTH

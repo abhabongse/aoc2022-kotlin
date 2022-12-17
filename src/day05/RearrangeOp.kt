@@ -11,7 +11,7 @@ data class RearrangeOp(val count: Int, val source: Char, val dest: Char) {
         /**
          * Creates an object by parsing the given [string].
          */
-        infix fun fromString(string: String): RearrangeOp {
+        infix fun from(string: String): RearrangeOp {
             val (count, source, dest) = pattern.matchEntire(string.trim())
                 ?.destructured
                 ?: throw IllegalArgumentException("invalid input line: $string")

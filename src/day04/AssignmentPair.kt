@@ -10,7 +10,7 @@ data class AssignmentPair(val firstRange: IntRange, val secondRange: IntRange) {
         /**
          * Creates an object by parsing the given [string].
          */
-        infix fun fromString(string: String): AssignmentPair {
+        infix fun from(string: String): AssignmentPair {
             val (firstStart, firstEnd, secondStart, secondEnd) = pattern.matchEntire(string.trim())
                 ?.destructured
                 ?: throw IllegalArgumentException("invalid input line: $string")

@@ -30,7 +30,7 @@ fun main() {
 fun readInput(fileName: String): List<MoveInstruction> {
     return File("inputs", fileName)
         .readLines()
-        .map { MoveInstruction fromString it }
+        .map { MoveInstruction from it }
 }
 
 /**

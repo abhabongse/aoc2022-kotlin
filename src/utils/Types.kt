@@ -11,6 +11,16 @@ inline fun <T> Boolean.thenOrNull(crossinline valueInit: () -> T?): T? = if (thi
 }
 
 /**
+ * When the expression evaluates to `false`, it throws an exception.
+ * Useful for data validation.
+ */
+inline fun Boolean.otherwiseThrow(crossinline execFunc: () -> Exception) = if (this) {
+    Unit
+} else {
+    throw execFunc()
+}
+
+/**
  * Debug prints items from a give list
  */
 fun <T> List<T>.toDebugString(): String =

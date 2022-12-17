@@ -15,7 +15,7 @@ sealed class Command {
     class ListDirectoryContent : Command() {
         companion object {
             /** Creates an object by parsing the given [string]. */
-            infix fun fromString(string: String): ListDirectoryContent? =
+            internal fun fromStringOrNull(string: String): ListDirectoryContent? =
                 (string.trim() == "ls").thenOrNull { ListDirectoryContent() }
         }
 
@@ -31,7 +31,7 @@ sealed class Command {
                 /**
                  * Creates an object by parsing the given [string].
                  */
-                infix fun fromString(string: String): ListDirectoryResult {
+                infix fun from(string: String): ListDirectoryResult {
                     val tokens = string.split("""\s+""".toRegex())
                     return if (tokens.size != 2) {
                         throw IllegalArgumentException("unknown command: $string")
@@ -48,10 +48,10 @@ sealed class Command {
 
     data class ChangeDirectory(val arg: String) : Command() {
         companion object {
-            val pattern = """cd (\S+)""".toRegex()
+            private val pattern = """cd (\S+)""".toRegex()
 
             /** Creates an object by parsing the given [string]. */
-            infix fun fromString(string: String): ChangeDirectory? =
+            internal fun fromStringOrNull(string: String): ChangeDirectory? =
                 pattern.matchEntire(string.trim())
                     ?.destructured
                     ?.let { (arg) -> ChangeDirectory(arg) }
@@ -60,9 +60,9 @@ sealed class Command {
 
     companion object {
         /** Creates an object by parsing the given [string]. */
-        infix fun fromString(string: String): Command =
-            (ListDirectoryContent fromString string)
-                ?: (ChangeDirectory fromString string)
+        infix fun from(string: String): Command =
+            (ListDirectoryContent.fromStringOrNull(string))
+                ?: (ChangeDirectory.fromStringOrNull(string))
                 ?: throw IllegalArgumentException("unknown command: $string")
     }
 }

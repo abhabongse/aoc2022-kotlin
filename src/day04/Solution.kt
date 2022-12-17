@@ -31,7 +31,7 @@ fun readInput(fileName: String): List<AssignmentPair> {
     return File("inputs", fileName)
         .readLines()
         .asSequence()
-        .map { AssignmentPair fromString it }
+        .map { AssignmentPair from it }
         .toList()
 }
 

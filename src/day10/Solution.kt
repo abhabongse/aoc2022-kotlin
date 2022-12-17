@@ -54,5 +54,5 @@ fun main() {
 fun readInput(fileName: String): List<CpuInstruction> {
     return File("inputs", fileName)
         .readLines()
-        .map { CpuInstruction fromString it }
+        .map { CpuInstruction from it }
 }
